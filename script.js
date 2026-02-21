@@ -51,8 +51,8 @@
     overlay = document.createElement('div');
     overlay.setAttribute('aria-hidden', 'true');
     overlay.style.cssText = [
-      'position:fixed', 'inset:0', 'background:rgba(0,0,0,0.4)',
-      'z-index:98', 'backdrop-filter:blur(2px)', '-webkit-backdrop-filter:blur(2px)'
+      'position:fixed', 'inset:0', 'background:rgba(0,0,0,0.25)',
+      'z-index:98'
     ].join(';');
     overlay.addEventListener('click', closeNav);
     document.body.appendChild(overlay);
