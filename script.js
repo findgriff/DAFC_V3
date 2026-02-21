@@ -43,6 +43,7 @@
   let overlay = null;
 
   function openNav() {
+    if (overlay) overlay.remove();
     navLinks.classList.add('is-open');
     toggle.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
@@ -51,7 +52,8 @@
     overlay = document.createElement('div');
     overlay.setAttribute('aria-hidden', 'true');
     overlay.style.cssText = [
-      'position:fixed', 'inset:0', 'background:rgba(0,0,0,0.25)',
+      'position:fixed', 'top:var(--header-h)', 'left:0', 'right:0', 'bottom:0',
+      'background:rgba(0,0,0,0.25)',
       'z-index:98'
     ].join(';');
     overlay.addEventListener('click', closeNav);
