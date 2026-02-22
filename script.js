@@ -141,55 +141,48 @@
 
 /* ===== CONTACT FORM ===== */
 (function () {
-  const form = document.querySelector('.contact-form');
-  if (!form) return;
+  const forms = document.querySelectorAll('.contact-form');
+  if (!forms.length) return;
 
-  const API_URL = 'https://forms.aressentinel.com/submit';
-  const API_KEY = '8a3019080f00ea13bd77076152e6ae7bb5c6d2ecb938a9c7';
-  const SITE_ID = 'dafc';
+  forms.forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      if (!btn) return;
 
-    const btn = form.querySelector('button[type="submit"]');
-    const originalText = btn.textContent;
+      const originalText = btn.textContent;
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
 
-    btn.textContent = 'Sending…';
-    btn.disabled = true;
+      const payload = {
+        name: form.querySelector('input[name="name"]')?.value || '',
+        email: form.querySelector('input[name="email"]')?.value || '',
+        topic: form.querySelector('select[name="topic"]')?.value || 'General enquiry',
+        message: form.querySelector('textarea[name="message"]')?.value || '',
+        page: window.location.pathname,
+      };
 
-    const name = form.querySelector('input[name="name"]')?.value || '';
-    const email = form.querySelector('input[name="email"]')?.value || '';
-    const topic = form.querySelector('select[name="topic"]')?.value || '';
-    const message = form.querySelector('textarea[name="message"]')?.value || '';
-
-    fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-      },
-      body: JSON.stringify({
-        site_id: SITE_ID,
-        name: name,
-        email: email,
-        topic: topic,
-        message: message,
-      }),
-    })
-      .then(function (res) {
-        if (!res.ok) throw new Error('Request failed');
-        btn.textContent = 'Message sent!';
-        form.reset();
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       })
-      .catch(function () {
-        btn.textContent = 'Failed — try again';
-      })
-      .finally(function () {
-        setTimeout(function () {
-          btn.textContent = originalText;
-          btn.disabled = false;
-        }, 2500);
-      });
+        .then(function (res) {
+          if (!res.ok) throw new Error('Request failed');
+          btn.textContent = 'Message sent!';
+          form.reset();
+        })
+        .catch(function () {
+          btn.textContent = 'Failed - try again';
+        })
+        .finally(function () {
+          setTimeout(function () {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }, 2500);
+        });
+    });
   });
 })();
 

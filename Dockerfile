@@ -1,6 +1,15 @@
-FROM nginx:1.27-alpine
+FROM node:20-alpine
 
-# Copy static site files into nginx web root.
-COPY . /usr/share/nginx/html
+WORKDIR /app
 
-EXPOSE 80
+COPY package*.json ./
+RUN npm install --omit=dev
+
+COPY . .
+
+ENV NODE_ENV=production
+ENV PORT=5000
+
+EXPOSE 5000
+
+CMD ["npm", "start"]

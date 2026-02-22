@@ -1,6 +1,6 @@
 # Darley Abbey FC — Website
 
-Modern, clean static website for Darley Abbey FC. Built to serve as a club identity site + monetisable local football blog using Google AdSense.
+Modern website for Darley Abbey FC with a built-in contact API for SMTP email delivery.
 
 ## Files
 
@@ -19,25 +19,32 @@ Modern, clean static website for Darley Abbey FC. Built to serve as a club ident
 
 ## Running Locally
 
-No build step required — it's plain HTML/CSS/JS.
+Install dependencies and run the Node server:
 
 ```bash
-# Option 1: Python (built in to macOS/Linux)
-python3 -m http.server 8000
-# then open http://localhost:8000
+npm install
+SMTP_HOST=mail.privateemail.com \
+SMTP_PORT=465 \
+SMTP_USER=info@darleyabbeyfc.com \
+SMTP_PASS=your-password \
+CONTACT_TO=info@darleyabbeyfc.com \
+npm start
+# then open http://localhost:5000
 
-# Option 2: Node.js
-npx serve .
-
-# Option 3: VS Code
-# Install "Live Server" extension, right-click index.html → Open with Live Server
+# Contact form posts to /api/contact on this server.
 ```
 
 ### Run Locally (Docker, same approach as Dokku)
 
 ```bash
 docker build -t dafc-site .
-docker run --rm -p 8080:80 dafc-site
+docker run --rm -p 8080:5000 \
+  -e SMTP_HOST=mail.privateemail.com \
+  -e SMTP_PORT=465 \
+  -e SMTP_USER=info@darleyabbeyfc.com \
+  -e SMTP_PASS=your-password \
+  -e CONTACT_TO=info@darleyabbeyfc.com \
+  dafc-site
 # then open http://localhost:8080
 ```
 
@@ -108,16 +115,19 @@ Replace ad slot placeholders:
 **Note:** AdSense won't show real ads until your site is approved. Add the AdSense script to all pages, publish the site, then apply for approval at [adsense.google.com](https://adsense.google.com).
 
 ### 3. Set Up Contact Form
-The contact form currently uses a placeholder timeout. Connect it to a real service:
+The contact forms submit to `/api/contact` and send through SMTP.
 
-**Formspree (easiest — free tier available):**
-1. Sign up at [formspree.io](https://formspree.io)
-2. Create a new form, get your form ID
-3. Change the form `action` in `index.html` to `https://formspree.io/f/YOUR-FORM-ID`
-4. Remove the `e.preventDefault()` in script.js (or use their AJAX approach)
+For Dokku, set these config vars:
 
-**Netlify Forms (if hosting on Netlify):**
-Add `data-netlify="true"` to each form element — Netlify handles the rest.
+```bash
+dokku config:set dafc-site \
+  SMTP_HOST=mail.privateemail.com \
+  SMTP_PORT=465 \
+  SMTP_USER=info@darleyabbeyfc.com \
+  SMTP_PASS=your-password \
+  CONTACT_TO=info@darleyabbeyfc.com \
+  CONTACT_FROM=info@darleyabbeyfc.com
+```
 
 ### 4. Set Up Newsletter
 Replace the newsletter form handler in `script.js`. Options:
@@ -190,8 +200,10 @@ Fonts are loaded from Google Fonts in each HTML `<head>`. Change the `@import` U
 
 - **HTML5** — semantic, accessible markup
 - **CSS3** — custom properties, grid, flexbox, no frameworks
-- **Vanilla JS** — ~150 lines, no dependencies
+- **Vanilla JS** — front-end interactions and form submission
+- **Node.js + Express** — serves site + contact API endpoint
+- **Nodemailer** — SMTP delivery for contact messages
 - **Google Fonts** — Outfit (headings) + Inter (body)
 - **Google AdSense** — monetisation slots throughout
 
-No Node.js, no build step, no dependencies. Open any HTML file in a browser to preview.
+The website is served by Node in production so contact email works on Dokku.
