@@ -5,6 +5,29 @@
 
 'use strict';
 
+/* ===== COOKIE BANNER ===== */
+(function () {
+  const KEY = 'dafc-cookie-ok';
+  if (localStorage.getItem(KEY)) return;
+
+  const banner = document.createElement('div');
+  banner.className = 'cookie-banner';
+  banner.innerHTML = `
+    <div class="cookie-banner__content">
+      <span>We use cookies to improve your experience. By using this site, you agree to our use of cookies.</span>
+      <button class="cookie-banner__cta" type="button">OK</button>
+    </div>
+  `;
+
+  const btn = banner.querySelector('.cookie-banner__cta');
+  btn.addEventListener('click', function () {
+    localStorage.setItem(KEY, 'true');
+    banner.remove();
+  });
+
+  document.body.appendChild(banner);
+})();
+
 /* ===== STICKY HEADER ===== */
 (function () {
   const header = document.getElementById('site-header');
@@ -121,25 +144,33 @@
   const form = document.querySelector('.contact-form');
   if (!form) return;
 
+  const MAILTO = 'info@darleyabbeyfc.com';
+
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
     const btn = form.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
 
-    btn.textContent = 'Sending…';
+    btn.textContent = 'Opening email…';
     btn.disabled = true;
 
-    // Replace this with your actual form submission (Formspree, Netlify, etc.)
-    // Example: fetch('https://formspree.io/f/YOUR-ID', { method: 'POST', body: new FormData(form) })
+    const name = form.querySelector('input[name="name"]')?.value || '';
+    const email = form.querySelector('input[name="email"]')?.value || '';
+    const topic = form.querySelector('select[name="topic"]')?.value || '';
+    const message = form.querySelector('textarea[name="message"]')?.value || '';
+
+    const subject = encodeURIComponent('DAFC Contact Form');
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n${topic ? `Topic: ${topic}\n` : ''}\nMessage:\n${message}`
+    );
+
+    window.location.href = `mailto:${MAILTO}?subject=${subject}&body=${body}`;
+
     setTimeout(function () {
-      btn.textContent = 'Message sent!';
-      form.reset();
-      setTimeout(function () {
-        btn.textContent = originalText;
-        btn.disabled = false;
-      }, 3000);
-    }, 1000);
+      btn.textContent = originalText;
+      btn.disabled = false;
+    }, 1500);
   });
 })();
 
