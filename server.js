@@ -170,29 +170,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  express.static(rootDir, {
-    extensions: ["html"],
-    index: "index.html",
-  })
-);
+app.use(express.static(rootDir, { extensions: ["html"] }));
 
-app.get("/", (_req, res) => {
-  res.sendFile(path.join(rootDir, "index.html"));
-});
-
-app.get("*", (req, res, next) => {
-  if (req.path.startsWith("/api/")) {
-    next();
-    return;
-  }
-
-  if (path.extname(req.path)) {
-    res.status(404).send("Not found");
-    return;
-  }
-
-  res.sendFile(path.join(rootDir, "index.html"));
+app.use((_req, res) => {
+  res.status(404).sendFile(path.join(rootDir, "index.html"));
 });
 
 app.listen(port, () => {
