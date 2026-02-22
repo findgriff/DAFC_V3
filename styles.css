@@ -2108,3 +2108,12 @@ a.ticker-item:hover { color: #fff; }
   gap: var(--space-2);
   color: var(--text-secondary);
 }
+
+.team-card ul {
+  column-count: 2;
+  column-gap: var(--space-8);
+}
+
+@media (max-width: 720px) {
+  .team-card ul { column-count: 1; }
+}
