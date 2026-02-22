@@ -144,7 +144,9 @@
   const form = document.querySelector('.contact-form');
   if (!form) return;
 
-  const MAILTO = 'info@darleyabbeyfc.com';
+  const API_URL = 'https://forms.aressentinel.com/submit';
+  const API_KEY = '8a3019080f00ea13bd77076152e6ae7bb5c6d2ecb938a9c7';
+  const SITE_ID = 'dafc';
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -152,7 +154,7 @@
     const btn = form.querySelector('button[type="submit"]');
     const originalText = btn.textContent;
 
-    btn.textContent = 'Opening email…';
+    btn.textContent = 'Sending…';
     btn.disabled = true;
 
     const name = form.querySelector('input[name="name"]')?.value || '';
@@ -160,17 +162,34 @@
     const topic = form.querySelector('select[name="topic"]')?.value || '';
     const message = form.querySelector('textarea[name="message"]')?.value || '';
 
-    const subject = encodeURIComponent('DAFC Contact Form');
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\n${topic ? `Topic: ${topic}\n` : ''}\nMessage:\n${message}`
-    );
-
-    window.location.href = `mailto:${MAILTO}?subject=${subject}&body=${body}`;
-
-    setTimeout(function () {
-      btn.textContent = originalText;
-      btn.disabled = false;
-    }, 1500);
+    fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+      },
+      body: JSON.stringify({
+        site_id: SITE_ID,
+        name: name,
+        email: email,
+        topic: topic,
+        message: message,
+      }),
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Request failed');
+        btn.textContent = 'Message sent!';
+        form.reset();
+      })
+      .catch(function () {
+        btn.textContent = 'Failed — try again';
+      })
+      .finally(function () {
+        setTimeout(function () {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        }, 2500);
+      });
   });
 })();
 
