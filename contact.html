@@ -174,9 +174,8 @@
   <script>
     const contactForm = document.getElementById('contact-form');
     const formMessage = document.getElementById('form-message');
-    const submitBtn = document.getElementById('submit-btn');
 
-    contactForm.addEventListener('submit', async (e) => {
+    contactForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const name = document.getElementById('name').value;
@@ -184,42 +183,20 @@
       const topic = document.getElementById('topic').value;
       const message = document.getElementById('message').value;
 
-      // Disable submit button
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending...';
-      formMessage.style.display = 'none';
+      // Construct mailto URL with form data
+      const subject = `Darley Abbey FC Contact: ${topic}`;
+      const body = `Name: ${name}\nEmail: ${email}\nTopic: ${topic}\n\nMessage:\n${message}`;
+      const mailtoLink = `mailto:info@darleyabbeyfc.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
-      try {
-        const response = await fetch('https://forms.darleyabbeyfc.com/api/contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ name, email, topic, message })
-        });
+      // Open email client
+      window.location.href = mailtoLink;
 
-        const data = await response.json();
-
-        if (data.success) {
-          formMessage.style.display = 'block';
-          formMessage.style.backgroundColor = '#d4edda';
-          formMessage.style.color = '#155724';
-          formMessage.style.borderLeft = '4px solid #28a745';
-          formMessage.innerHTML = '<strong>Thank you!</strong> Your message has been sent. We\'ll get back to you soon.';
-          contactForm.reset();
-        } else {
-          throw new Error(data.error || 'Failed to send message');
-        }
-      } catch (error) {
-        formMessage.style.display = 'block';
-        formMessage.style.backgroundColor = '#f8d7da';
-        formMessage.style.color = '#721c24';
-        formMessage.style.borderLeft = '4px solid #f5c6cb';
-        formMessage.innerHTML = '<strong>Error:</strong> ' + error.message;
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Send Message';
-      }
+      // Show confirmation message
+      formMessage.style.display = 'block';
+      formMessage.style.backgroundColor = '#d4edda';
+      formMessage.style.color = '#155724';
+      formMessage.style.borderLeft = '4px solid #28a745';
+      formMessage.innerHTML = '<strong>Thank you!</strong> Your email client is opening. Please complete sending the email.';
     });
   </script>
 </body>
