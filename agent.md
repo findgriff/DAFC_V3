@@ -118,4 +118,5 @@ If anything critical is missing, ask up to 5 questions max. Otherwise proceed us
 
 ## Recent fixture data log
 - 2026-03-08: Latest results/fixtures were pulled from The FA Full-Time (divisionseason=101823955, teamID=94823525) for Darley Abbey FC First; update `fixtures.html` after each matchday to keep the summary current.
+- 2026-03-08: Verified the live Dokku site still served the old list, so after pulling from `origin/main` restart `dokku ps:restart dafc` (or use `dokku git:sync dafc origin main` + restart) so the new HTML is published.
 - Store this log here so future runs can quickly find the source without re-scouting.
